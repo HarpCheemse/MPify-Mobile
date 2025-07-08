@@ -1,0 +1,38 @@
+name: mpify
+description: "A way to manage/play mp3 file with additional support for yt-dlp."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  material_design_icons_flutter: ^7.0.7296
+  path: ^1.9.0
+  provider: 
+  audioplayers: ^6.5.0
+  crypto:
+  pasteboard: 
+  file_picker:
+  archive:
+  loading_animation_widget:
+  top_snackbar_flutter: ^3.3.0
+  url_launcher: 
+  shared_preferences: 
+  screen_retriever: 
+  path_provider: ^2.1.5
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
