@@ -38,7 +38,6 @@ class _EditSongFormState extends State<EditSongForm> {
   late TextEditingController artist = TextEditingController();
   bool _isReset = false;
   Uint8List? _imageBytes;
-  final FocusNode _focusNode = FocusNode();
 
   Future<void> _pickImage() async {
     final result = await FilePicker.platform.pickFiles(
@@ -150,7 +149,7 @@ class _EditSongFormState extends State<EditSongForm> {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Material(
             borderRadius: BorderRadius.circular(10),
-            color: Theme.of(context).colorScheme.surfaceContainer,
+            color: Theme.of(context).colorScheme.surfaceContainer.withAlpha(100),
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height* 3 /5,
@@ -174,25 +173,21 @@ class _EditSongFormState extends State<EditSongForm> {
                   SizedBox(height: 40),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Expanded(
-                      child: CustomInputBar(
-                        controller: name,
-                        onChanged: (query) {},
-                        hintText: 'Edit Name',
-                        fontColor: Theme.of(context).colorScheme.onSurface,
-                        hintColor: Theme.of(context).colorScheme.onSurface,
-                        searchColor: const Color.fromARGB(134, 95, 95, 95),
-                        iconColor: Theme.of(context).colorScheme.onSurface,
-                        icon: Icons.edit_outlined,
-                      ),
+                    child: CustomInputBar(
+                      controller: name,
+                      onChanged: (query) {},
+                      hintText: 'Edit Name',
+                      fontColor: Theme.of(context).colorScheme.onSurface,
+                      hintColor: Theme.of(context).colorScheme.onSurface,
+                      searchColor: const Color.fromARGB(134, 95, 95, 95),
+                      iconColor: Theme.of(context).colorScheme.onSurface,
+                      icon: Icons.edit_outlined,
                     ),
                   ),
                   const SizedBox(height: 30,),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Expanded(
-                      child: AutocompleteArtistInputBar(controller: artist),
-                    ),
+                    child: AutocompleteArtistInputBar(controller: artist),
                   ),
                   const SizedBox(height: 30,),
                   Row(

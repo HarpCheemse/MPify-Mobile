@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mpify/models/settings_models.dart';
+import 'package:mpify/main.dart';
 import 'package:mpify/models/song_models.dart';
 import 'package:mpify/utils/folder_ultis.dart';
 import 'package:mpify/utils/misc_utils.dart';
@@ -49,7 +49,7 @@ class _ScrollableListSongState extends State<ScrollableListSong> {
       child: RawScrollbar(
         thumbVisibility: true,
         controller: _scrollController,
-        thumbColor: Theme.of(context).colorScheme.onSurface,
+        thumbColor: Theme.of(context).colorScheme.surfaceContainer,
         radius: Radius.circular(5),
         thickness: 10,
         trackVisibility: false,
@@ -58,8 +58,11 @@ class _ScrollableListSongState extends State<ScrollableListSong> {
           builder: (context, songs, child) {
             return ListView.builder(
               controller: _scrollController,
-              itemCount: songs.length,
+              itemCount: songs.length + 1,
               itemBuilder: (BuildContext content, int index) {
+                if (index == songs.length) {
+                  return SizedBox(height: 30);
+                }
                 final song = songs[index];
                 return SongTitle(
                   songName: song.name,
@@ -152,9 +155,9 @@ class SongTitle extends StatelessWidget {
       },
       child: Row(
         children: [
-          const SizedBox(width: 10,),
+          const SizedBox(width: 10),
           Text('${index + 1}', style: textStyle_16),
-          const SizedBox(width: 20,),
+          const SizedBox(width: 20),
           SizedBox(
             width: 50,
             height: 50,
@@ -165,6 +168,7 @@ class SongTitle extends StatelessWidget {
             flex: 10,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   songName,
@@ -302,7 +306,14 @@ class SongOptionMenu extends StatelessWidget {
 
 class CoverImage extends StatefulWidget {
   final String identifier;
-  const CoverImage({super.key, required this.identifier});
+  final double? height;
+  final double? width;
+  const CoverImage({
+    super.key,
+    required this.identifier,
+    this.height,
+    this.width,
+  });
   @override
   State<CoverImage> createState() => _CoverImageState();
 }
@@ -325,7 +336,7 @@ class _CoverImageState extends State<CoverImage> {
 
   void _checkImageExist() {
     final imageFile = File(
-      p.join(Directory.current.path, '..', 'cover', '${widget.identifier}.png'),
+      p.join(globalAppDocDir.path, 'cover', '${widget.identifier}.png'),
     );
     imageExist = imageFile.existsSync();
   }
@@ -339,20 +350,17 @@ class _CoverImageState extends State<CoverImage> {
   @override
   Widget build(BuildContext context) {
     return imageExist
-        ? Image.file(
-            File(
-              p.join(
-                Directory.current.path,
-                '..',
-                'cover',
-                '${widget.identifier}.png',
+        ? SizedBox(
+          width: widget.width,
+          height: widget.height,
+          child: Image.file(
+              File(
+                p.join(globalAppDocDir.path, 'cover', '${widget.identifier}.png'),
               ),
+              key: UniqueKey(), //Important to clear image cached
+              fit: BoxFit.cover,
             ),
-            key: UniqueKey(), //Important to clear image cached
-            fit: BoxFit.cover,
-            cacheWidth: 50,
-            cacheHeight: 50,
-          )
-        : Image.asset('assets/placeholder.png', fit: BoxFit.contain);
+        )
+        : SizedBox(height: widget.height, width: widget.width, child: Image.asset('assets/placeholder.png', fit: BoxFit.contain));
   }
 }

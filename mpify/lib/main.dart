@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mpify/models/playlist_models.dart';
@@ -6,11 +7,13 @@ import 'package:mpify/models/settings_models.dart';
 import 'package:mpify/models/song_models.dart';
 import 'package:mpify/screen/home_screen.dart';
 import 'package:mpify/utils/folder_ultis.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
+late final Directory globalAppDocDir;
 
 double maxScreenWidth = 1920;
 double maxScreenHeight = 1080;
@@ -20,6 +23,7 @@ void main() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp
   ]);
+  globalAppDocDir = await getApplicationDocumentsDirectory();
 
   runZonedGuarded(
     () async {

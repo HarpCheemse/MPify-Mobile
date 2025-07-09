@@ -3,7 +3,7 @@ import 'package:mpify/models/song_models.dart';
 import 'package:provider/provider.dart';
 
 class DurationSlider extends StatefulWidget {
-  final double width;
+  final double? width;
   final double height;
   final double value;
   final Color baseColor;
@@ -15,7 +15,7 @@ class DurationSlider extends StatefulWidget {
 
   const DurationSlider({
     super.key,
-    required this.width,
+    this.width,
     required this.height,
     required this.value,
     required this.baseColor,

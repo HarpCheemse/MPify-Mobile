@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mpify/models/song_models.dart';
+import 'package:mpify/screen/home_screen.dart';
 import 'package:mpify/utils/folder_ultis.dart';
 import 'package:mpify/utils/misc_utils.dart';
 import 'package:mpify/utils/playlist_ultis.dart';
@@ -18,11 +19,7 @@ import 'package:file_picker/file_picker.dart';
 class ScrollableListPlaylist extends StatefulWidget {
   final double? width;
   final double? height;
-  const ScrollableListPlaylist({
-    super.key,
-    this.width,
-    this.height,
-  });
+  const ScrollableListPlaylist({super.key, this.width, this.height});
 
   @override
   State<ScrollableListPlaylist> createState() => _ScrollableListBoxState();
@@ -49,7 +46,7 @@ class _ScrollableListBoxState extends State<ScrollableListPlaylist> {
     return Container(
       width: widget.width,
       height: widget.height,
-      color: Colors.red,
+      color: Colors.transparent,
       child: Scrollbar(
         thumbVisibility: true,
         controller: _scrollController,
@@ -61,13 +58,13 @@ class _ScrollableListBoxState extends State<ScrollableListPlaylist> {
                 return ListView.builder(
                   controller: _scrollController,
                   itemCount: length,
-                  itemExtent: constraints.maxHeight/5,
+                  itemExtent: constraints.maxHeight / 6,
                   itemBuilder: (BuildContext content, int index) {
                     final playlistName = playlist.playlists[index];
                     return PlaylistFolder(playlistName: playlistName);
                   },
                 );
-              }
+              },
             );
           },
         ),
@@ -96,10 +93,14 @@ class PlaylistFolder extends StatelessWidget {
       width: 320,
       height: 70,
       onPressed: () {
-        // context.read<PlaylistModels>().setSelectedPlaylist(playlistName);
-        // context.read<SongModels>().loadSong(playlistName);
-        // Watcher.playlistSongWatcher(context, playlistName);
-        MiscUtils.showWarning('Hello');
+        context.read<PlaylistModels>().setSelectedPlaylist(playlistName);
+        context.read<SongModels>().loadSong(playlistName);
+        Watcher.playlistSongWatcher(context, playlistName);
+        mainMenuPageController.animateToPage(
+          1,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
       },
       child: Row(
         children: [
@@ -139,21 +140,6 @@ class PlaylistOptionMenu extends StatelessWidget {
       ),
       color: Theme.of(context).colorScheme.surface,
       itemBuilder: (BuildContext context) => [
-        PopupMenuItem<String>(
-          child: Row(
-            children: [
-              Icon(
-                Icons.file_open_outlined,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              const SizedBox(width: 10),
-              Text('Open File Location', style: textStyle),
-            ],
-          ),
-          onTap: () {
-            FolderUtils.openFolderInExplorer();
-          },
-        ),
         PopupMenuItem(
           child: Row(
             children: [
@@ -185,7 +171,7 @@ class PlaylistOptionMenu extends StatelessWidget {
                         );
                         (result)
                             ? MiscUtils.showSuccess(
-                                'Successfully Created A Back Up Of $playlistName At Backup Folder',
+                                'Successfully Created A Back Up Of $playlistName At Document Folder',
                               )
                             : MiscUtils.showError(
                                 'Error: Unable To Create A Back Up Of $playlistName',

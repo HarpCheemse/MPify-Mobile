@@ -1,16 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:mpify/main.dart';
-import 'package:mpify/models/settings_models.dart';
 import 'package:mpify/models/song_models.dart';
 import 'package:mpify/utils/folder_ultis.dart';
 import 'package:mpify/utils/misc_utils.dart';
 import 'package:mpify/widgets/shared/text_style/montserrat_style.dart';
 import 'package:mpify/widgets/shared/button/hover_button.dart';
 import 'package:mpify/widgets/shared/input_bar/input_bar.dart';
-import 'package:mpify/widgets/shared/overlay/overlay_controller.dart';
-import 'package:mpify/widgets/shared/overlay/overlay_gui/create_song_form.dart';
 import 'package:mpify/widgets/shared/scrollable/scrollable_song.dart';
 
 import 'package:provider/provider.dart';
@@ -35,9 +31,9 @@ class SongHeader extends StatefulWidget {
 }
 
 class _SongHeader extends State<SongHeader> {
+  final TextEditingController controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final TextEditingController controller = TextEditingController();
     return Column(
       children: [
         Container(
@@ -46,7 +42,6 @@ class _SongHeader extends State<SongHeader> {
           width: double.infinity,
           decoration: BoxDecoration(
             color: const Color.fromARGB(255, 0, 140, 255),
-            borderRadius: BorderRadius.all(Radius.circular(10)),
             gradient: LinearGradient(
               colors: [
                 const Color.fromARGB(159, 0, 140, 255),
@@ -183,12 +178,8 @@ class _SongHeader extends State<SongHeader> {
                   ),
                   const SizedBox(width: 30),
                   IconButton(
-                    icon: Icon(
-                      Icons.add_circle_sharp,
-                      size: 30,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
+                    icon: Icon(Icons.add, size: 30, color: Colors.white),
+                    onPressed: () async {
                       if (context.read<PlaylistModels>().selectedPlaylist ==
                           "Playlist Name") {
                         MiscUtils.showWarning(
@@ -196,7 +187,13 @@ class _SongHeader extends State<SongHeader> {
                         );
                         return;
                       }
-                      OverlayController.show(context, CreateSongForm());
+                      final String selectedPlaylist = context
+                          .read<PlaylistModels>()
+                          .selectedPlaylist;
+                      final songModels = context.read<SongModels>();
+                      await FolderUtils.addCustomMP3(selectedPlaylist);
+                      songModels.loadSong(selectedPlaylist);
+                      return;
                     },
                   ),
                   const Expanded(child: SizedBox()),
@@ -225,15 +222,15 @@ class _SongHeader extends State<SongHeader> {
             ),
           ),
         ),
-        const SizedBox(height: 10,),
+        const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: SizedBox(
             width: double.infinity,
-            height: MediaQuery.of(context).size.height/2,
-            child: ScrollableListSong(color: Colors.transparent,),
+            height: MediaQuery.of(context).size.height / 2,
+            child: ScrollableListSong(color: Colors.transparent),
           ),
-        )
+        ),
       ],
     );
   }

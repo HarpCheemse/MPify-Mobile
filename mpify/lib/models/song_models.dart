@@ -64,11 +64,12 @@ class SongModels extends ChangeNotifier {
   void refresh() {
     notifyListeners();
   }
+
   List<String> _artistList = [];
   List<String> get artistList => _artistList;
   void loadArtistList() {
     _artistList = _songsActive.map((song) => song.artist).toSet().toList();
-    _artistList.sort((a,b) => a.compareTo(b));
+    _artistList.sort((a, b) => a.compareTo(b));
     notifyListeners();
   }
 
@@ -79,9 +80,8 @@ class SongModels extends ChangeNotifier {
     _sortOption = option;
     try {
       final prefs = await SharedPreferences.getInstance();
-    prefs.setString('sortOption', option.name);
-    }
-    catch (e) {
+      prefs.setString('sortOption', option.name);
+    } catch (e) {
       FolderUtils.writeLog('Error: $e. Unable To Saved Sort Option Prefs');
     }
     applySortActivePlaylist(option);
@@ -93,10 +93,9 @@ class SongModels extends ChangeNotifier {
   void flipIsShuffle() async {
     _isShuffle = !_isShuffle;
     try {
-       final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isShuffle', _isShuffle);
-    }
-    catch (e) {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setBool('isShuffle', _isShuffle);
+    } catch (e) {
       FolderUtils.writeLog('Error: $e. Unable To Saved Shuffle Prefs');
     }
     notifyListeners();
@@ -159,7 +158,9 @@ class SongModels extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    _songsActive = List<Song>.from(await PlaylistUltis.parsePlaylistJSON(playlistFile));
+    _songsActive = List<Song>.from(
+      await PlaylistUltis.parsePlaylistJSON(playlistFile),
+    );
     applySortActivePlaylist(_sortOption);
     applySortBackgroundPlaylist(_sortOption);
     if (_isShuffle) {
@@ -167,12 +168,11 @@ class SongModels extends ChangeNotifier {
     }
     try {
       final prefs = await SharedPreferences.getInstance();
-    prefs.setString(
-      'activeSong',
-      jsonEncode(_songsActive.map((song) => song.toJson()).toList()),
-    );
-    }
-    catch (e) {
+      prefs.setString(
+        'activeSong',
+        jsonEncode(_songsActive.map((song) => song.toJson()).toList()),
+      );
+    } catch (e) {
       FolderUtils.writeLog('Error: $e. Unable To Save Active Playlist Prefs');
       return;
     }

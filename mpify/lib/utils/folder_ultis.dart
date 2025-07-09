@@ -33,9 +33,7 @@ class FolderUtils {
 
   static Future<Directory> checkPlaylistFolderExist() async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final Directory playlistDir = Directory(
-      p.join(appDocDir.path,'playlist'),
-    );
+    final Directory playlistDir = Directory(p.join(appDocDir.path, 'playlist'));
     if (!await playlistDir.exists()) {
       await playlistDir.create(recursive: true);
     }
@@ -44,7 +42,7 @@ class FolderUtils {
 
   static Future<Directory> checkMP3FolderExist() async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final Directory mp3Dir = Directory(p.join(appDocDir.path,'mp3'));
+    final Directory mp3Dir = Directory(p.join(appDocDir.path, 'mp3'));
     if (!await mp3Dir.exists()) {
       await mp3Dir.create(recursive: true);
     }
@@ -53,9 +51,7 @@ class FolderUtils {
 
   static Future<Directory> checkCoverFolderExist() async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final Directory coverDir = Directory(
-      p.join(appDocDir.path,'cover'),
-    );
+    final Directory coverDir = Directory(p.join(appDocDir.path, 'cover'));
     if (!await coverDir.exists()) {
       await coverDir.create(recursive: true);
     }
@@ -64,9 +60,7 @@ class FolderUtils {
 
   static Future<Directory> checkLyricFolderExist() async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final Directory lyricDir = Directory(
-      p.join(appDocDir.path, 'lyric'),
-    );
+    final Directory lyricDir = Directory(p.join(appDocDir.path, 'lyric'));
     if (!await lyricDir.exists()) {
       await lyricDir.create(recursive: true);
     }
@@ -75,9 +69,7 @@ class FolderUtils {
 
   static Future<Directory> checkBackupFolderExist() async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final Directory backupDir = Directory(
-      p.join(appDocDir.path, 'backup'),
-    );
+    final Directory backupDir = Directory(p.join(appDocDir.path, 'backup'));
     if (!await backupDir.exists()) {
       await backupDir.create(recursive: true);
     }
@@ -86,13 +78,7 @@ class FolderUtils {
 
   static void openFolderInExplorer() async {
     final Directory path = await FolderUtils.checkPlaylistFolderExist();
-    if (Platform.isWindows) {
-      Process.run('explorer', [path.path]);
-    } else if (Platform.isMacOS) {
-      Process.run('open', [path.path]);
-    } else if (Platform.isLinux) {
-      Process.run('xdg-open', [path.path]);
-    }
+    MiscUtils.showNotification('Go To $path');
   }
 
   static void writeLyricToFolder(text, identifier) async {
@@ -114,7 +100,10 @@ class FolderUtils {
 
   static Future<bool> createBackupFile(String playlist) async {
     final DateTime timeStamp = DateTime.now();
-    final Directory backupDir = await FolderUtils.checkBackupFolderExist();
+    Directory backupDir = Directory('/storage/emulated/0/Download');
+    if (!await backupDir.exists()) {
+      return false;
+    }
     final Directory playlistDir = await FolderUtils.checkPlaylistFolderExist();
     final String backupName =
         '${timeStamp.year}_${timeStamp.month}_${timeStamp.day}_${timeStamp.hour}_${timeStamp.minute}_${timeStamp.second}_backup';
@@ -353,7 +342,7 @@ class FolderUtils {
 
   static Future<void> writeLog(String messege) async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final logFile = File(p.join(appDocDir.path,'log.txt'));
+    final logFile = File(p.join(appDocDir.path, 'log.txt'));
     if (!await logFile.exists()) {
       await logFile.create(recursive: true);
     }
@@ -366,7 +355,7 @@ class FolderUtils {
 
   static Future<void> clearLog() async {
     final Directory appDocDir = await getApplicationDocumentsDirectory();
-    final File logFile = File(p.join(appDocDir.path,'log.txt'));
+    final File logFile = File(p.join(appDocDir.path, 'log.txt'));
     try {
       await logFile.writeAsString('', mode: FileMode.write);
     } catch (e) {
@@ -403,7 +392,9 @@ class FolderUtils {
 
     final String name = mp3File.name;
     final String link = "";
-    final String duration = StringUltis.formatDuration(await AudioUtils.getSongDuration(identifier));
+    final String duration = StringUltis.formatDuration(
+      await AudioUtils.getSongDuration(identifier),
+    );
     final String artist = 'Unknown';
     final DateTime dateAdded = DateTime.now();
 
@@ -430,7 +421,7 @@ class FolderUtils {
         identifier: identifier,
       );
       playlist.add(newMp3);
-      
+
       await playlistFile.writeAsString(
         jsonEncode(playlist.map((song) => song.toJson()).toList()),
       );

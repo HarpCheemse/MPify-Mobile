@@ -99,7 +99,7 @@ class SongDetailsOptions extends StatelessWidget {
                   context.read<PlaylistModels>().tooglePlayer();
                 },
               ),
-              const SizedBox(width: 10,),
+              const SizedBox(width: 10),
             ],
           );
         }
@@ -125,6 +125,7 @@ class DurationBar extends StatelessWidget {
                 padding: EdgeInsets.only(right: 30),
                 child: IconButton(
                   icon: Icon(Icons.skip_previous, color: Colors.white),
+                  iconSize: 32,
                   onPressed: () {
                     final songModels = context.read<SongModels>();
                     songModels.playPreviousSong();
@@ -135,6 +136,7 @@ class DurationBar extends StatelessWidget {
                 padding: EdgeInsets.only(right: 30),
                 child: IconButton(
                   icon: Icon(Icons.fast_rewind, color: Colors.white),
+                  iconSize: 32,
                   onPressed: () {
                     AudioUtils.skipBackward(context);
                   },
@@ -152,8 +154,8 @@ class DurationBar extends StatelessWidget {
                             : AudioUtils.resumeSong();
                         model.flipIsPlaying();
                       },
-                      width: 40,
-                      height: 40,
+                      width: 60,
+                      height: 60,
                       hoverColor: const Color.fromARGB(255, 150, 150, 150),
                       child: Transform.translate(
                         offset: Offset(0, 0),
@@ -170,6 +172,7 @@ class DurationBar extends StatelessWidget {
                 padding: EdgeInsets.only(left: 30),
                 child: IconButton(
                   icon: Icon(Icons.fast_forward),
+                  iconSize: 32,
                   color: Colors.white,
                   onPressed: () {
                     AudioUtils.skipForward(context);
@@ -180,6 +183,7 @@ class DurationBar extends StatelessWidget {
                 padding: EdgeInsets.only(left: 30),
                 child: IconButton(
                   icon: Icon(Icons.skip_next, color: Colors.white),
+                  iconSize: 32,
                   onPressed: () {
                     final songModels = context.read<SongModels>();
                     songModels.playNextSong();
@@ -189,33 +193,29 @@ class DurationBar extends StatelessWidget {
             ],
           ),
         ),
-        Row(
-          children: [
-            Consumer<SongModels>(
-              builder: (context, value, child) {
-                final songProgress = StringUltis.formatDuration(
-                  value.songProgress,
-                );
-                return SizedBox(
-                  width: 45,
-                  child: Text(
-                    songProgress,
-                    style: montserratStyle(
-                      context: context,
-                      fontWeight: FontWeight.w300,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Row(
+            children: [
+              Consumer<SongModels>(
+                builder: (context, value, child) {
+                  final songProgress = StringUltis.formatDuration(
+                    value.songProgress,
+                  );
+                  return SizedBox(
+                    width: 45,
+                    child: Text(
+                      songProgress,
+                      style: montserratStyle(
+                        context: context,
+                        fontWeight: FontWeight.w300,
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final double width = MediaQuery.of(context).size.width;
-                final double percentage = width / maxScreenWidth;
-                final double availWidth = 650 * percentage;
-
-                return DurationSlider(
-                  width: this.width ?? availWidth,
+                  );
+                },
+              ),
+              Expanded(
+                child: DurationSlider(
                   height: 1,
                   value: 0,
                   baseColor: const Color.fromARGB(255, 150, 150, 150),
@@ -224,29 +224,29 @@ class DurationBar extends StatelessWidget {
                   thumbSize: 5,
                   thumbColor: Colors.green,
                   onChanged: (double value) {},
-                );
-              },
-            ),
-            const SizedBox(width: 10),
-            Consumer<SongModels>(
-              builder: (context, value, child) {
-                final songDuration = StringUltis.formatDuration(
-                  value.songDuration,
-                );
-
-                return SizedBox(
-                  width: 45,
-                  child: Text(
-                    songDuration,
-                    style: montserratStyle(
-                      context: context,
-                      fontWeight: FontWeight.w300,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Consumer<SongModels>(
+                builder: (context, value, child) {
+                  final songDuration = StringUltis.formatDuration(
+                    value.songDuration,
+                  );
+          
+                  return SizedBox(
+                    width: 45,
+                    child: Text(
+                      songDuration,
+                      style: montserratStyle(
+                        context: context,
+                        fontWeight: FontWeight.w300,
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
-          ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ],
     );
