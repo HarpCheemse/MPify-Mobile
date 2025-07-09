@@ -225,9 +225,11 @@ class SongModels extends ChangeNotifier {
   }
 
   Future<void> playNextSong() async {
+    debugPrint("$_songsBackground");
+    debugPrint("${_songsBackground.length}");
     if (_songsBackground.isEmpty) return;
     setIsPlaying(true);
-    if (_currentSongIndex < 0 || _currentSongIndex > _songsBackground.length) {
+    if (_currentSongIndex < 0 || _currentSongIndex >= _songsBackground.length) {
       return;
     }
     if (_currentSongIndex + 1 < _songsBackground.length) {
@@ -236,6 +238,7 @@ class SongModels extends ChangeNotifier {
       _currentSongIndex = 0;
     }
     notifyListeners();
+    debugPrint(_songsBackground[_currentSongIndex].identifier);
     await AudioUtils.playSong(_songsBackground[_currentSongIndex].identifier);
   }
 
@@ -278,45 +281,6 @@ class SongModels extends ChangeNotifier {
         _currentSongIndex = i;
         break;
       }
-    }
-    notifyListeners();
-  }
-
-  Duration _songDuration = Duration.zero;
-  Duration _songProgress = Duration.zero;
-
-  Duration get songDuration => _songDuration;
-  Duration get songProgress => _songProgress;
-
-  void setSongDurationZero() {
-    _songDuration = Duration.zero;
-    _songProgress = Duration.zero;
-  }
-
-  final _audioPlayer = AudioUtils.player;
-
-  SongModels() {
-    AudioUtils.player.onPlayerComplete.listen((event) {
-      playNextSong();
-    });
-    _audioPlayer.onDurationChanged.listen((duration) {
-      _songDuration = duration;
-      notifyListeners();
-    });
-
-    _audioPlayer.onPositionChanged.listen((position) {
-      _songProgress = position;
-      notifyListeners();
-    });
-  }
-
-  void seek(Duration position) {
-    if (songDuration.inSeconds <= 0) return;
-    try {
-      _audioPlayer.seek(position);
-      _songProgress = position;
-    } catch (e) {
-      FolderUtils.writeLog('Error: $e. Unable To Seek To $position.');
     }
     notifyListeners();
   }

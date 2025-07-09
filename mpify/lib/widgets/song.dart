@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:mpify/models/audio_models.dart';
 import 'package:mpify/models/song_models.dart';
 import 'package:mpify/utils/folder_ultis.dart';
 import 'package:mpify/utils/misc_utils.dart';
@@ -115,7 +116,8 @@ class _SongHeader extends State<SongHeader> {
 
                             final songsBackground = songModels.songsBackground;
                             if (songsBackground.isEmpty) {
-                              songs.setSongDurationZero();
+                              if (!context.mounted) return;
+                              context.read<AudioModels>().setSongDurationZero();
                               await AudioUtils.stopSong();
                               return;
                             }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mpify/main.dart';
+import 'package:mpify/models/audio_models.dart';
 import 'package:mpify/models/playlist_models.dart';
 import 'package:mpify/models/song_models.dart';
 import 'package:mpify/utils/string_ultis.dart';
@@ -197,7 +198,7 @@ class DurationBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Row(
             children: [
-              Consumer<SongModels>(
+              Consumer<AudioModels>(
                 builder: (context, value, child) {
                   final songProgress = StringUltis.formatDuration(
                     value.songProgress,
@@ -227,7 +228,7 @@ class DurationBar extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Consumer<SongModels>(
+              Consumer<AudioModels>(
                 builder: (context, value, child) {
                   final songDuration = StringUltis.formatDuration(
                     value.songDuration,

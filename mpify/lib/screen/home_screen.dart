@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mpify/models/audio_models.dart';
 import 'package:mpify/models/song_models.dart';
 import 'package:mpify/utils/audio_ultis.dart';
 import 'package:mpify/utils/string_ultis.dart';
@@ -282,7 +283,7 @@ class MiniSongPlayer extends StatelessWidget {
                   right: 0,
                   child: Row(
                     children: [
-                      Selector<SongModels, double>(
+                      Selector<AudioModels, double>(
                         selector: (_, models) {
                           final int totalSecond = models.songDuration.inSeconds;
                           final int currentSecond =

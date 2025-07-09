@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mpify/models/audio_models.dart';
 import 'package:mpify/models/playlist_models.dart';
 import 'package:mpify/models/settings_models.dart';
 import 'package:mpify/models/song_models.dart';
@@ -20,9 +21,7 @@ double maxScreenHeight = 1080;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp
-  ]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   globalAppDocDir = await getApplicationDocumentsDirectory();
 
   runZonedGuarded(
@@ -35,6 +34,15 @@ void main() async {
             providers: [
               ChangeNotifierProvider(create: (_) => PlaylistModels()),
               ChangeNotifierProvider(create: (_) => SongModels()),
+              ChangeNotifierProvider(
+                create: (context) {
+                  final songModels = Provider.of<SongModels>(
+                    context,
+                    listen: false,
+                  );
+                  return AudioModels(songModels: songModels);
+                },
+              ),
               ChangeNotifierProvider(
                 create: (context) {
                   final settingsModel = SettingsModels();

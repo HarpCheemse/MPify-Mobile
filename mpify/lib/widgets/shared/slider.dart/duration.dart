@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mpify/models/song_models.dart';
+import 'package:mpify/models/audio_models.dart';
 import 'package:provider/provider.dart';
 
 class DurationSlider extends StatefulWidget {
@@ -51,7 +51,7 @@ class _DurationSliderState extends State<DurationSlider> {
                 : SliderComponentShape.noThumb,
             trackHeight: widget.height,
           ),
-          child: Consumer<SongModels>(
+          child: Consumer<AudioModels>(
             builder: (context, value, child) {
               final totalSecond = value.songDuration.inSeconds;
               final currentSecond = value.songProgress.inSeconds;
@@ -61,7 +61,7 @@ class _DurationSliderState extends State<DurationSlider> {
                 min: 0,
                 max: totalSecond > 0 ? totalSecond.toDouble() : 1,
                 onChanged: (newValue) {
-                  context.read<SongModels>().seek(Duration(seconds: newValue.toInt()));
+                  context.read<AudioModels>().seek(Duration(seconds: newValue.toInt()));
                 },
               );
             },
