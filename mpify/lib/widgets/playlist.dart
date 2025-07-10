@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mpify/models/playlist_models.dart';
 import 'package:mpify/widgets/shared/text_style/montserrat_style.dart';
 import 'package:mpify/widgets/shared/button/hover_button.dart';
 import 'package:mpify/widgets/shared/input_bar/input_bar.dart';
 import 'package:mpify/widgets/shared/overlay/overlay_controller.dart';
 import 'package:mpify/widgets/shared/overlay/overlay_gui/create_playlist_form.dart';
 import 'package:mpify/widgets/shared/scrollable/scrollable_playlist.dart';
+import 'package:provider/provider.dart';
 
 class Playlist extends StatefulWidget {
   const Playlist({super.key});
@@ -37,7 +39,9 @@ class _PlaylistState extends State<Playlist> {
           const SizedBox(height: 20),
           CustomInputBar(
             controller: controller,
-            onChanged: (query) {},
+            onChanged: (query) {
+              context.read<PlaylistModels>().updatePlaylistSearchQuery(query);
+            },
             hintText: 'Search Playlist',
             fontColor: Theme.of(context).colorScheme.onSurface,
             hintColor: Theme.of(context).colorScheme.onSurface,

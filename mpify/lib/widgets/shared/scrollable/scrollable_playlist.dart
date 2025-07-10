@@ -50,9 +50,10 @@ class _ScrollableListBoxState extends State<ScrollableListPlaylist> {
       child: Scrollbar(
         thumbVisibility: true,
         controller: _scrollController,
-        child: Consumer<PlaylistModels>(
-          builder: (context, playlist, child) {
-            final length = playlist.playlists.length;
+        child: Selector<PlaylistModels, List<String>>(
+          selector: (_, models) => models.playlists,
+          builder: (_, playlists, _) {
+            final length = playlists.length;
             return LayoutBuilder(
               builder: (context, constraints) {
                 return ListView.builder(
@@ -60,7 +61,7 @@ class _ScrollableListBoxState extends State<ScrollableListPlaylist> {
                   itemCount: length,
                   itemExtent: constraints.maxHeight / 6,
                   itemBuilder: (BuildContext content, int index) {
-                    final playlistName = playlist.playlists[index];
+                    final playlistName = playlists[index];
                     return PlaylistFolder(playlistName: playlistName);
                   },
                 );
@@ -211,7 +212,7 @@ class PlaylistOptionMenu extends StatelessWidget {
               return;
             }
             if (!context.mounted) {
-              MiscUtils.showWarning('Warning: Contexted Removed');
+              MiscUtils.showWarning('Warning: Context Removed');
               return;
             }
             showDialog(
@@ -273,7 +274,7 @@ class PlaylistOptionMenu extends StatelessWidget {
                 Confirmation(
                   headerText: 'Delete Playlist',
                   warningText:
-                      'This action is pernament are you sure you want to delete this playlist?',
+                      'Are You Sure You Want to Delete "$playlistName"? This Action Is Permanent',
                   function: () => PlaylistUltis.deletePlaylist(playlistName),
                 ),
               );

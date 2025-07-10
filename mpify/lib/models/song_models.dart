@@ -147,6 +147,9 @@ class SongModels extends ChangeNotifier {
     _currentSongIndex = index;
     notifyListeners();
   }
+  String getCurrentSongIdentifier() {
+    return (_songsBackground.isEmpty) ? "None" : (_songsBackground[_currentSongIndex].identifier);
+  }
 
   Future<void> loadSong(String playlist) async {
     final playlistDir = await FolderUtils.checkPlaylistFolderExist();

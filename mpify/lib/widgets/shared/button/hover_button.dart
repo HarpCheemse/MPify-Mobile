@@ -51,7 +51,7 @@ class _HoverButtonState extends State<HoverButton> {
       onExit: (_) => setState(() => _hovering = false),
       child: AnimatedContainer(
         duration: Duration(milliseconds: 150),
-        decoration:BoxDecoration(
+        decoration: BoxDecoration(
           color: _hovering ? widget.hoverColor : widget.baseColor,
           borderRadius: BorderRadius.circular(widget.borderRadius),
         ),

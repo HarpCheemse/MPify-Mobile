@@ -13,15 +13,16 @@ import 'package:mpify/widgets/song.dart';
 import 'package:provider/provider.dart';
 
 final PageController mainMenuPageController = PageController();
+final GlobalKey<HomeScreenState> homeScreenKey = GlobalKey<HomeScreenState>();
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [Playlist(), Songs(), Settings()];
   void _onTap(int index) {
@@ -40,6 +41,10 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
   }
+  void navigateToPage(int index) {
+    _onTap(index);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: _pages,
                   ),
                 ),
-                bottomNavigationBar(context),
+                SafeArea(child: bottomNavigationBar(context)),
               ],
             ),
             Positioned(
@@ -68,15 +73,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 selector: (context, models) =>
                     models.songsBackground.isNotEmpty,
                 builder: (_, isPlaying, _) {
-                  if (isPlaying && _selectedIndex != 2) {
-                    return Positioned(
-                      bottom: (MediaQuery.of(context).size.height / 10) - 10,
-                      left: 0,
-                      child: MiniSongPlayer(),
-                    );
-                  } else {
-                    return SizedBox();
-                  }
+                  return AnimatedSwitcher(
+                    duration: Duration(milliseconds: 200),
+                    child: (isPlaying && _selectedIndex != 2)
+                        ? MiniSongPlayer(key: ValueKey('miniSongPlayer'))
+                        : SizedBox.shrink(key: ValueKey('empty')),
+                  );
                 },
               ),
             ),
@@ -259,9 +261,13 @@ class MiniSongPlayer extends StatelessWidget {
                           hoverColor: const Color.fromARGB(255, 150, 150, 150),
                           child: Transform.translate(
                             offset: Offset(0, 0),
-                            child: Icon(
-                              isPlaying ? Icons.pause : Icons.play_arrow,
-                              color: Colors.white,
+                            child: AnimatedSwitcher(
+                              duration: Duration(milliseconds: 150),
+                              child: Icon(
+                                isPlaying ? Icons.pause : Icons.play_arrow,
+                                color: Colors.white,
+                                key: ValueKey(isPlaying),
+                              ),
                             ),
                           ),
                         );

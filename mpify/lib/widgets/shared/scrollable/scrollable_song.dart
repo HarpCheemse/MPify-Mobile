@@ -114,13 +114,9 @@ class SongTitle extends StatelessWidget {
     final playingPlaylist = context.select<PlaylistModels, String>(
       (model) => model.playingPlaylist,
     );
-    final currentSongIdentifier = context.select<SongModels, String>((model) {
-      final backgroundSong = model.songsBackground;
-      final index = model.currentSongIndex;
-      return (backgroundSong.isEmpty)
-          ? "None"
-          : backgroundSong[index].identifier;
-    });
+    final currentSongIdentifier = context.select<SongModels, String>(
+      (models) => models.getCurrentSongIdentifier(),
+    );
     bool isSelected =
         (selectedPlaylist == playingPlaylist) &&
         (identifier == currentSongIdentifier);
@@ -351,16 +347,24 @@ class _CoverImageState extends State<CoverImage> {
   Widget build(BuildContext context) {
     return imageExist
         ? SizedBox(
-          width: widget.width,
-          height: widget.height,
-          child: Image.file(
+            width: widget.width,
+            height: widget.height,
+            child: Image.file(
               File(
-                p.join(globalAppDocDir.path, 'cover', '${widget.identifier}.png'),
+                p.join(
+                  globalAppDocDir.path,
+                  'cover',
+                  '${widget.identifier}.png',
+                ),
               ),
               key: UniqueKey(), //Important to clear image cached
               fit: BoxFit.cover,
             ),
-        )
-        : SizedBox(height: widget.height, width: widget.width, child: Image.asset('assets/placeholder.png', fit: BoxFit.contain));
+          )
+        : SizedBox(
+            height: widget.height,
+            width: widget.width,
+            child: Image.asset('assets/placeholder.png', fit: BoxFit.contain),
+          );
   }
 }

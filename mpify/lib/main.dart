@@ -97,7 +97,7 @@ class MPify extends StatelessWidget {
       themeMode: themeProvider.themeMode,
       navigatorKey: navigatorKey,
       scaffoldMessengerKey: scaffoldMessengerKey,
-      home: const HomeScreen(),
+      home: HomeScreen(key: homeScreenKey),
     );
   }
 }

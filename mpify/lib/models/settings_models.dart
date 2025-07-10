@@ -3,28 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mpify/models/playlist_models.dart';
 import 'package:mpify/models/song_models.dart';
+import 'package:mpify/screen/home_screen.dart';
 import 'package:mpify/utils/folder_ultis.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum SettingsCategory { general, audio, backup, troubleshooter, about }
-
 class SettingsModels extends ChangeNotifier {
-  bool _isOpenSettings = false;
-  bool get isOpenSettings => _isOpenSettings;
-  void flipIsOpenSetting() {
-    _isOpenSettings = !_isOpenSettings;
-    notifyListeners();
-  }
-
-  SettingsCategory _selectedCategory = SettingsCategory.general;
-  SettingsCategory get selectedCategory => _selectedCategory;
-
-  void setSettingCategory(SettingsCategory category) {
-    _selectedCategory = category;
-    notifyListeners();
-  }
-
   ThemeMode _themeMode = ThemeMode.dark;
   ThemeMode get themeMode => _themeMode;
 
@@ -33,11 +17,10 @@ class SettingsModels extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       prefs.setBool('isDarkmode', isDark);
-    }
-    catch (e) {
+    } catch (e) {
       FolderUtils.writeLog('Error: $e. Unable To Saved Dark Mode Prefs');
     }
-    
+
     notifyListeners();
   }
 
@@ -53,6 +36,9 @@ class SettingsModels extends ChangeNotifier {
         prefs.getString('selectedPlaylist') ?? 'Playlist Name';
     if (!context.mounted) return;
     context.read<PlaylistModels>().setSelectedPlaylist(selectedPlaylist);
+    if (selectedPlaylist != "Playlist Name") {
+      homeScreenKey.currentState?.navigateToPage(1);
+    }
     final isDark = prefs.getBool('isDarkmode') ?? true;
     toogleTheme(isDark);
 
@@ -78,12 +64,14 @@ class SettingsModels extends ChangeNotifier {
       context.read<SongModels>().applySortActivePlaylist(sortOption);
     });
   }
+
   bool _showArtist = true;
   bool get showArtist => _showArtist;
   void setShowArtist(bool value) {
     _showArtist = value;
     notifyListeners();
   }
+
   bool _showDuration = true;
   bool get showDuration => _showDuration;
   void setShowDuration(bool value) {

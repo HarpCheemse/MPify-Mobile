@@ -39,7 +39,6 @@ class _SongHeader extends State<SongHeader> {
       children: [
         Container(
           //header
-          height: MediaQuery.of(context).size.height / 4.5,
           width: double.infinity,
           decoration: BoxDecoration(
             color: const Color.fromARGB(255, 0, 140, 255),
@@ -92,25 +91,27 @@ class _SongHeader extends State<SongHeader> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10,),
               Row(
                 children: [
                   const SizedBox(width: 10),
-                  Consumer<SongModels>(
-                    builder: (context, songs, child) {
+                  Selector<SongModels, bool>(
+                    selector: (context, models) => models.isPlaying,
+                    builder: (context, isPlaying, child) {
+                      final songModels = context.read<SongModels>();
+                      final playlistModels = context.read<PlaylistModels>();
                       return HoverButton(
                         baseColor: Colors.white,
                         borderRadius: 50,
                         onPressed: () async {
-                          if (context.read<PlaylistModels>().selectedPlaylist ==
-                              context.read<PlaylistModels>().playingPlaylist) {
-                            songs.isPlaying
+                          if (playlistModels.selectedPlaylist ==
+                              playlistModels.playingPlaylist) {
+                            isPlaying
                                 ? AudioUtils.pauseSong()
                                 : AudioUtils.resumeSong();
-                            songs.flipIsPlaying();
+                            songModels.flipIsPlaying();
                           } else {
-                            context.read<PlaylistModels>().setPlayingPlaylist();
-                            final songModels = context.read<SongModels>();
+                            playlistModels.setPlayingPlaylist();
                             await songModels
                                 .loadActivePlaylistSong(); //copy activeSong to background song
 
@@ -137,25 +138,29 @@ class _SongHeader extends State<SongHeader> {
                               MiscUtils.showError(
                                 'Error: Unable To Play Audio',
                               );
-                              FolderUtils.writeLog(
-                                'Error: $e. Unable To Play Audio',
-                              );
                             }
                           }
                         },
                         width: 60,
                         height: 60,
                         hoverColor: const Color.fromARGB(255, 206, 206, 206),
-                        child: Consumer<PlaylistModels>(
-                          builder: (context, playlist, child) {
-                            return Icon(
-                              (playlist.selectedPlaylist ==
-                                      playlist.playingPlaylist)
-                                  ? (songs.isPlaying
-                                        ? Icons.pause
-                                        : Icons.play_arrow)
-                                  : Icons.play_arrow,
-                              color: Colors.black,
+                        child: Selector<SongModels, bool>(
+                          selector: (_, models) => models.isPlaying,
+                          builder: (context, isPlaying, child) {
+                            final playlistModels = context
+                                .read<PlaylistModels>();
+                            return AnimatedSwitcher(
+                              duration: Duration(milliseconds: 150),
+                              child: Icon(
+                                (playlistModels.selectedPlaylist ==
+                                        playlistModels.playingPlaylist)
+                                    ? (isPlaying
+                                          ? Icons.pause
+                                          : Icons.play_arrow)
+                                    : Icons.play_arrow,
+                                color: Colors.black,
+                                key: ValueKey(isPlaying),
+                              ),
                             );
                           },
                         ),
@@ -170,17 +175,18 @@ class _SongHeader extends State<SongHeader> {
                         : Colors.white,
                     iconSize: 30,
                     onPressed: () {
-                      context.read<SongModels>().isShuffle
-                          ? context.read<SongModels>().unshuffleSongs()
-                          : context.read<SongModels>().shuffleSongs(
-                              context.read<SongModels>().currentSongIndex,
+                      final songModels = context.read<SongModels>();
+                      songModels.isShuffle
+                          ? songModels.unshuffleSongs()
+                          : songModels.shuffleSongs(
+                              songModels.currentSongIndex,
                             );
-                      context.read<SongModels>().flipIsShuffle();
+                      songModels.flipIsShuffle();
                     },
                   ),
                   const SizedBox(width: 30),
                   IconButton(
-                    icon: Icon(Icons.add, size: 30, color: Colors.white),
+                    icon: const Icon(Icons.add, size: 32, color: Colors.grey),
                     onPressed: () async {
                       if (context.read<PlaylistModels>().selectedPlaylist ==
                           "Playlist Name") {
@@ -202,6 +208,7 @@ class _SongHeader extends State<SongHeader> {
                   SongSortOption(),
                 ],
               ),
+              const SizedBox(height: 10,),
             ],
           ),
         ),

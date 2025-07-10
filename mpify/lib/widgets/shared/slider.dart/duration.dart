@@ -52,7 +52,7 @@ class _DurationSliderState extends State<DurationSlider> {
             trackHeight: widget.height,
           ),
           child: Consumer<AudioModels>(
-            builder: (context, value, child) {
+            builder: (_, value, _) {
               final totalSecond = value.songDuration.inSeconds;
               final currentSecond = value.songProgress.inSeconds;
 
@@ -61,7 +61,7 @@ class _DurationSliderState extends State<DurationSlider> {
                 min: 0,
                 max: totalSecond > 0 ? totalSecond.toDouble() : 1,
                 onChanged: (newValue) {
-                  context.read<AudioModels>().seek(Duration(seconds: newValue.toInt()));
+                  value.seek(Duration(seconds: newValue.toInt()));
                 },
               );
             },
