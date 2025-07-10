@@ -234,8 +234,14 @@ class FolderUtils {
     final Directory coverDir = await checkCoverFolderExist();
     final Directory lyricDir = await checkLyricFolderExist();
     final Directory mp3Dir = await checkMP3FolderExist();
-    final bytes = result.files.first.bytes!;
-    final archive = ZipDecoder().decodeBytes(bytes);
+    final filePath = result.files.first.path;
+    if(filePath == null) {
+      MiscUtils.showError('No File Path Found');
+      return;
+    }
+    final inputStream = InputFileStream(filePath);
+    final archive = ZipDecoder().decodeStream(inputStream);
+
 
     for (final file in archive) {
       if (file.isFile) {

@@ -205,7 +205,7 @@ class PlaylistOptionMenu extends StatelessWidget {
         PopupMenuItem(
           onTap: () async {
             final FilePickerResult? result = await FilePicker.platform
-                .pickFiles(type: FileType.any, withData: true);
+                .pickFiles(type: FileType.any, withData: false);
             if (result == null || result.files.isEmpty) {
               MiscUtils.showError('Error: No Backup File Choosen');
               FolderUtils.writeLog('Error: No Song Backup File Choosen');
