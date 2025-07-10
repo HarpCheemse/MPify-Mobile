@@ -141,7 +141,6 @@ class SongModels extends ChangeNotifier {
       (song) => song.identifier == songIdentifier,
     );
     if (index == -1) {
-      debugPrint('$songIdentifier does not exit in the list');
       return;
     }
     _currentSongIndex = index;
@@ -156,7 +155,6 @@ class SongModels extends ChangeNotifier {
     final playlistFile = File(p.join(playlistDir.path, '$playlist.json'));
 
     if (!await playlistFile.exists()) {
-      debugPrint('playlist does not exit');
       _songsActive = [];
       notifyListeners();
       return;
@@ -228,8 +226,6 @@ class SongModels extends ChangeNotifier {
   }
 
   Future<void> playNextSong() async {
-    debugPrint("$_songsBackground");
-    debugPrint("${_songsBackground.length}");
     if (_songsBackground.isEmpty) return;
     setIsPlaying(true);
     if (_currentSongIndex < 0 || _currentSongIndex >= _songsBackground.length) {
@@ -241,7 +237,6 @@ class SongModels extends ChangeNotifier {
       _currentSongIndex = 0;
     }
     notifyListeners();
-    debugPrint(_songsBackground[_currentSongIndex].identifier);
     await AudioUtils.playSong(_songsBackground[_currentSongIndex].identifier);
   }
 
