@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mpify/models/audio_models.dart';
@@ -7,6 +8,7 @@ import 'package:mpify/models/playlist_models.dart';
 import 'package:mpify/models/settings_models.dart';
 import 'package:mpify/models/song_models.dart';
 import 'package:mpify/screen/home_screen.dart';
+import 'package:mpify/utils/audio_handler.dart';
 import 'package:mpify/utils/folder_ultis.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -15,15 +17,23 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 late final Directory globalAppDocDir;
-
-double maxScreenWidth = 1920;
-double maxScreenHeight = 1080;
+late final SongModels globalSongModel;
+late final AudioHandler audioHandler;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   globalAppDocDir = await getApplicationDocumentsDirectory();
 
+  audioHandler = await AudioService.init(
+    builder: () => MyAudioHandler(),
+    config: AudioServiceConfig(
+      androidNotificationChannelId: 'com.mpify.channel.audio',
+      androidNotificationChannelName: 'Mpify Playback',
+      androidNotificationOngoing: true,
+      androidNotificationIcon: 'drawable/ic_stat_music_note',
+    ),
+  );
   runZonedGuarded(
     () async {
       await FolderUtils.clearLog();
@@ -33,7 +43,10 @@ void main() async {
           MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (_) => PlaylistModels()),
-              ChangeNotifierProvider(create: (_) => SongModels()),
+              ChangeNotifierProvider(create: (_) {
+                globalSongModel = SongModels();
+                return globalSongModel;
+              }),
               ChangeNotifierProvider(
                 create: (context) {
                   final songModels = Provider.of<SongModels>(

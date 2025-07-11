@@ -5,9 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mpify/models/song_models.dart';
-import 'package:mpify/utils/audio_ultis.dart';
 import 'package:mpify/utils/misc_utils.dart';
-import 'package:mpify/utils/string_ultis.dart';
 import 'package:path/path.dart' as p;
 import 'package:archive/archive_io.dart';
 import 'package:path_provider/path_provider.dart';
@@ -398,9 +396,7 @@ class FolderUtils {
 
     final String name = mp3File.name;
     final String link = "";
-    final String duration = StringUltis.formatDuration(
-      await AudioUtils.getSongDuration(identifier),
-    );
+    final String duration = "";
     final String artist = 'Unknown';
     final DateTime dateAdded = DateTime.now();
 

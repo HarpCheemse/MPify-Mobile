@@ -129,10 +129,13 @@ class _SongHeader extends State<SongHeader> {
                                 songsBackground[randomIndex].identifier;
                             songModels.getSongIndex(identifier);
                             songModels.setIsPlaying(true);
+                            final name = songsBackground[randomIndex].name;
+                            final artisit = songsBackground[randomIndex].artist;
                             try {
+                              if (!context.mounted) return;
                               AudioUtils.playSong(
                                 songsBackground[songModels.currentSongIndex]
-                                    .identifier,
+                                    .identifier, name, artisit
                               );
                             } catch (e) {
                               MiscUtils.showError(

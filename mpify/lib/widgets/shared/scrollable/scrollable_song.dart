@@ -140,9 +140,10 @@ class SongTitle extends StatelessWidget {
 
         songModels.getSongIndex(identifier);
         songModels.setIsPlaying(true);
+        if (!context.mounted) return;
         try {
           AudioUtils.playSong(
-            songsBackground[songModels.currentSongIndex].identifier,
+            songsBackground[songModels.currentSongIndex].identifier, songName, artist
           );
         } catch (e) {
           MiscUtils.showError('Error: Unable To Play Audio');

@@ -13,7 +13,6 @@ dependencies:
   material_design_icons_flutter: ^7.0.7296
   path: ^1.9.0
   provider: 
-  audioplayers: ^6.5.0
   crypto:
   pasteboard: 
   file_picker:
@@ -25,6 +24,9 @@ dependencies:
   path_provider: ^2.1.5
   flutter_launcher_icons: 
   flutter_native_splash: 
+  just_audio: 
+  audio_service: 
+  just_audio_background: 
 
 
 dev_dependencies:

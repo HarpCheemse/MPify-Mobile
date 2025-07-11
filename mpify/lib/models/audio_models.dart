@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:mpify/models/song_models.dart';
 import 'package:mpify/utils/audio_ultis.dart';
 import 'package:mpify/utils/misc_utils.dart';
@@ -6,6 +7,7 @@ import 'package:mpify/utils/misc_utils.dart';
 class AudioModels extends ChangeNotifier {
   final SongModels songModels;
   final _audioPlayer = AudioUtils.player;
+
   Duration _songDuration = Duration.zero;
   Duration _songProgress = Duration.zero;
 
@@ -17,16 +19,28 @@ class AudioModels extends ChangeNotifier {
     _songProgress = Duration.zero;
   }
 
+  //Prevent double trigger. Spent Hours Debugging To find the source. GG
+  bool completeHandlerFinish = false;
   AudioModels({required this.songModels}) {
-    _audioPlayer.onPlayerComplete.listen((event) {
-      songModels.playNextSong();
+    _audioPlayer.playerStateStream.listen((event) {
+      if (event.processingState == ProcessingState.completed) {
+        if (!completeHandlerFinish) {
+          songModels.playNextSong();
+          completeHandlerFinish = true;
+        }
+        else {
+          completeHandlerFinish = false;
+        }
+      }
     });
-    _audioPlayer.onDurationChanged.listen((duration) {
-      _songDuration = duration;
-      notifyListeners();
+    _audioPlayer.durationStream.listen((duration) {
+      if (duration != null) {
+        _songDuration = duration;
+        notifyListeners();
+      }
     });
 
-    _audioPlayer.onPositionChanged.listen((position) {
+    _audioPlayer.positionStream.listen((position) {
       _songProgress = position;
       notifyListeners();
     });
@@ -39,7 +53,6 @@ class AudioModels extends ChangeNotifier {
       _songProgress = position;
     } catch (e) {
       MiscUtils.showError('Error: Unable To Seek');
-
     }
     notifyListeners();
   }

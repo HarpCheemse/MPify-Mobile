@@ -41,10 +41,10 @@ class HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
   }
+
   void navigateToPage(int index) {
     _onTap(index);
   }
-
 
   @override
   Widget build(BuildContext context) {

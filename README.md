@@ -17,7 +17,7 @@ A open-source Flutter app to manage and play offline music on mobile
 - Flutter version ^3.8.1  
 # Installation  
 1. Check The Release Tab For Latest Version.
-
+x
 2. Or
 ### 1. Clone the repo: 
 - git clone https://github.com/Harpcheemse/Mpify.git  

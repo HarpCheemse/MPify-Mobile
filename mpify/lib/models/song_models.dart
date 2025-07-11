@@ -146,8 +146,11 @@ class SongModels extends ChangeNotifier {
     _currentSongIndex = index;
     notifyListeners();
   }
+
   String getCurrentSongIdentifier() {
-    return (_songsBackground.isEmpty) ? "None" : (_songsBackground[_currentSongIndex].identifier);
+    return (_songsBackground.isEmpty)
+        ? "None"
+        : (_songsBackground[_currentSongIndex].identifier);
   }
 
   Future<void> loadSong(String playlist) async {
@@ -236,13 +239,19 @@ class SongModels extends ChangeNotifier {
     } else {
       _currentSongIndex = 0;
     }
+    final name = _songsBackground[_currentSongIndex].name;
+    final artist = _songsBackground[_currentSongIndex].artist;
     notifyListeners();
-    await AudioUtils.playSong(_songsBackground[_currentSongIndex].identifier);
+    await AudioUtils.playSong(
+      _songsBackground[_currentSongIndex].identifier,
+      name,
+      artist,
+    );
   }
 
   Future<void> playPreviousSong() async {
     if (_songsBackground.isEmpty) return;
-    if (_currentSongIndex < 0 || currentSongIndex > _songsBackground.length) {
+    if (_currentSongIndex < 0 || currentSongIndex >= _songsBackground.length) {
       return;
     }
     if (_currentSongIndex - 1 >= 0) {
@@ -250,7 +259,14 @@ class SongModels extends ChangeNotifier {
     } else {
       _currentSongIndex = _songsBackground.length - 1;
     }
-    await AudioUtils.playSong(_songsBackground[_currentSongIndex].identifier);
+    final name = _songsBackground[_currentSongIndex].name;
+    final artist = _songsBackground[_currentSongIndex].artist;
+    notifyListeners();
+    await AudioUtils.playSong(
+      _songsBackground[_currentSongIndex].identifier,
+      name,
+      artist,
+    );
   }
 
   void shuffleSongs(int fixedIndex) {

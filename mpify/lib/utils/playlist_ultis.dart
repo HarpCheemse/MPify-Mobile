@@ -6,7 +6,6 @@ import 'package:path/path.dart' as p;
 import 'dart:convert';
 
 import 'package:mpify/utils/folder_ultis.dart';
-import 'package:mpify/utils/audio_ultis.dart';
 import 'package:mpify/utils/string_ultis.dart';
 
 import 'package:provider/provider.dart';
@@ -86,7 +85,7 @@ class PlaylistUltis {
       return false;
     }
 
-    final Duration duration = await AudioUtils.getSongDuration(identifier);
+    final Duration duration = Duration.zero;
     final int minutes = duration.inMinutes;
     final String seconds = duration.inSeconds
         .remainder(60)

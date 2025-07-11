@@ -1,79 +1,42 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:mpify/main.dart';
 import 'package:mpify/models/audio_models.dart';
+import 'package:mpify/utils/audio_handler.dart';
 import 'package:mpify/utils/misc_utils.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:audioplayers/audioplayers.dart';
-
 import 'package:mpify/utils/folder_ultis.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class AudioUtils {
+
   static final AudioPlayer player = AudioPlayer();
+  static Future<Uri> getCoverUri(String identifier) async {
+  final coverDir = await FolderUtils.checkCoverFolderExist();
+  final coverFile = File(p.join(coverDir.path, '$identifier.png'));
 
-  static Future<Duration> getSongDuration(String identifier) async {
-    final Directory mp3Dir = await FolderUtils.checkMP3FolderExist();
-    final String mp3FilePath = p.join(mp3Dir.path, '$identifier.mp3');
-    final File mp3File = File(mp3FilePath);
-    final String ffprobeExecutablePath = p.join(
-      Directory.current.path,
-      '..',
-      'ffprobe.exe',
-    );
-    if (!await mp3File.exists()) {
-      MiscUtils.showError('Error: Unable To Get Song Duration');
-      FolderUtils.writeLog('Error: Unable To Get Song Duration');
-      return Duration.zero;
-    }
-    late final Process process;
-    try {
-      process = await Process.start(ffprobeExecutablePath, [
-        '-i',
-        mp3FilePath,
-        '-v',
-        'quiet',
-        '-show_entries',
-        'format=duration',
-        '-hide_banner',
-        '-of',
-        'default=noprint_wrappers=1:nokey=1',
-      ], runInShell: false);
-    } catch (e) {
-      FolderUtils.writeLog('Error: Unable Run FFProbe');
-      return Duration.zero;
-    }
-
-    final List<String> stdoutLines = [];
-    final List<String> stderrLines = [];
-
-    process.stdout.transform(systemEncoding.decoder).listen((String data) {
-      stdoutLines.add(data.trim());
-    });
-    process.stderr.transform(systemEncoding.decoder).listen((String data) {
-      stderrLines.add(data.trim());
-    });
-
-    final exitCode = await process.exitCode;
-    if (exitCode != 0) {
-      FolderUtils.writeLog('Full STDERR: ${stderrLines.join('\n')}');
-      return Duration.zero;
-    }
-
-    final rawOutput = stdoutLines.join('').trim();
-    final seconds = double.tryParse(rawOutput);
-
-    if (seconds == null) {
-      FolderUtils.writeLog(
-        'Error: Unable To Parse Duration From: "$rawOutput"',
-      );
-      return Duration.zero;
-    }
-    return Duration(microseconds: (seconds * 1000000).toInt());
+  if (await coverFile.exists()) {
+    return Uri.file(coverFile.path);
+  } else {
+    final bytes = await rootBundle.load('assets/placeholder.png');
+    final tempDir = await getTemporaryDirectory();
+    final tempFile = File(p.join(tempDir.path, 'placeholder_$identifier.png'));
+    await tempFile.writeAsBytes(bytes.buffer.asUint8List(), flush: true);
+    return Uri.file(tempFile.path);
   }
+}
 
-  static Future<void> playSong(identifier) async {
+  static Future<void> playSong(
+    String identifier,
+    String name,
+    String artist,
+  ) async {
     final Directory target = await FolderUtils.checkMP3FolderExist();
     final File songFile = File(p.join(target.path, '$identifier.mp3'));
     if (!await songFile.exists()) {
@@ -82,8 +45,19 @@ class AudioUtils {
       return;
     }
     try {
-      player.stop();
-      await player.play(DeviceFileSource(songFile.path));
+      final Uri coverSrc = await getCoverUri(identifier);
+      final mediaItem = MediaItem(
+        id: identifier,
+        title: name,
+        artist: artist,
+        artUri: coverSrc,
+        album: 'Local',
+      );
+      await (audioHandler as MyAudioHandler).updateMediaItem(mediaItem);
+      final audioSource = AudioSource.file(songFile.path, tag: mediaItem);
+      await player.stop();
+      await player.setAudioSource(audioSource);
+      await audioHandler.play();
     } catch (e) {
       FolderUtils.writeLog('Error: $e. Unable To Play Song');
       MiscUtils.showError('Error: Unable To Play Song');
@@ -101,7 +75,7 @@ class AudioUtils {
 
   static Future<void> resumeSong() async {
     try {
-      await player.resume();
+      await player.play();
     } catch (e) {
       FolderUtils.writeLog('Error: $e. Unable To Resume Song');
       MiscUtils.showError('Error: Unable To Resume Song');
@@ -111,10 +85,8 @@ class AudioUtils {
   static Future<void> skipForward(BuildContext context) async {
     if (context.read<AudioModels>().songDuration.inSeconds <= 0) return;
     try {
-      final position = await player.getCurrentPosition();
-      if (position != null) {
-        await player.seek(position + const Duration(seconds: 5));
-      }
+      final position = player.position;
+      await player.seek(position + const Duration(seconds: 5));
     } catch (e) {
       FolderUtils.writeLog('Error: $e. Unable To Skip Forward');
       MiscUtils.showError('Error: Unable To Skip Forward');
@@ -124,25 +96,14 @@ class AudioUtils {
   static Future<void> skipBackward(BuildContext context) async {
     if (context.read<AudioModels>().songDuration.inSeconds <= 0) return;
     try {
-      final position = await player.getCurrentPosition();
-      if (position != null) {
-        final newPosition = position - const Duration(seconds: 5);
-        await player.seek(
-          newPosition > Duration.zero ? newPosition : Duration.zero,
-        );
-      }
+      final position = player.position;
+      final newPosition = position - const Duration(seconds: 5);
+      await player.seek(
+        newPosition > Duration.zero ? newPosition : Duration.zero,
+      );
     } catch (e) {
       FolderUtils.writeLog('Error: $e. Unable To Skip Backward');
       MiscUtils.showError('Error: Unable To Skip Backward');
-    }
-  }
-
-  static Future<void> setVolume(double value) async {
-    try {
-      await player.setVolume(value);
-    } catch (e) {
-      FolderUtils.writeLog('Error: $e. Unable To Set Volume To $value');
-      MiscUtils.showError('Error: Unable To Set Volume');
     }
   }
 
